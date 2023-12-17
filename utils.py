@@ -3,18 +3,6 @@ import polars.selectors as cs
 from polars.exceptions import ColumnNotFoundError
 
 
-def compare_schemas(expected, actual):
-    expected_len = len(expected)
-    actual_len = len(actual)
-    if expected_len != actual_len:
-        print("Schemas must have same number of elements!")
-    for actual_value, expected_value in zip(actual.items(), expected.items()):
-        if actual_value != expected_value:
-            print(
-                f"Field: {actual_value} does not match expected field: {expected_value}"
-            )
-
-
 def prepare_weather_data_source(
     source,
     directory,
@@ -63,3 +51,15 @@ def check_for_nulls(df, threshold):
         null_ratio = round(100 * value[0] / row_count, 2)
         if null_ratio >= threshold:
             print(f"{key} has {null_ratio} of null values")
+
+
+def compare_schemas(expected, actual):
+    expected_len = len(expected)
+    actual_len = len(actual)
+    if expected_len != actual_len:
+        print("Schemas must have same number of elements!")
+    for actual_value, expected_value in zip(actual.items(), expected.items()):
+        if actual_value != expected_value:
+            print(
+                f"Field: {actual_value} does not match expected field: {expected_value}"
+            )
