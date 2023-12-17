@@ -1,11 +1,15 @@
-# Config dict
-@dataclass
-class Config:
-    months: List[int] = [1]
-    years: List[int] = [2016]
-    regions: List[str] = ["New York"]
-    common_timestamp_column: str = "datetime"
-    weather_directory: str = "weather_data"
-    weather_file_ext: str = "csv"
-    taxi_files: str = "taxi_data/*parquet"
-    null_threshold: float = 0.1
+from dataclasses import dataclass
+from typing import List
+
+Config = {
+    "months": [1],
+    "years": [2016],
+    "regions": ["New York"],
+    "common_timestamp_column": "datetime",
+    "weather_directory": "weather_data",
+    "weather_file_ext": "csv",
+    "taxi_files": "taxi_data/*parquet",
+    "null_threshold": 0.1,
+    "output_dir": "output",
+    "output_file": "taxi_data_final.parquet",
+}

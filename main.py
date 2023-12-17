@@ -1,3 +1,4 @@
+import os
 import polars as pl
 from utils import (
     compare_schemas,
@@ -11,70 +12,70 @@ from config import Config
 
 # TODO: implement data checks for taxi and weather data
 # TODO: design diagram with draw.io
-# TODO: add argparser to process inputs
-
 
 if __name__ == "__main__":
     # preparation of taxi data
-    taxi_df = pl.read_parquet(taxi_files)
+    taxi_df = pl.read_parquet(Config["taxi_files"])
 
     compare_schemas(expected_taxi_data_schema, taxi_df.schema)
-    check_for_nulls(taxi_df, Config.null_threshold)
+    check_for_nulls(taxi_df, Config["null_threshold"])
 
     taxi_df = extract_datetime_information(taxi_df, "tpep_pickup_datetime")
 
     # preparation of weather data
     humidity = prepare_weather_data_source(
         "humidity",
-        Config.weather_directory,
-        Config.weather_file_ext,
-        Config.regions,
-        Config.common_timestamp_column,
-        Config.expected_weather_data_schema,
-        Config.null_threshold,
+        expected_weather_data_schema,
+        Config["weather_directory"],
+        Config["weather_file_ext"],
+        Config["regions"],
+        Config["common_timestamp_column"],
+        Config["null_threshold"],
     )
 
     pressure = prepare_weather_data_source(
         "pressure",
-        Config.weather_directory,
-        Config.weather_file_ext,
-        Config.regions,
-        Config.common_timestamp_column,
-        Config.expected_weather_data_schema,
-        Config.null_threshold,
+        expected_weather_data_schema,
+        Config["weather_directory"],
+        Config["weather_file_ext"],
+        Config["regions"],
+        Config["common_timestamp_column"],
+        Config["null_threshold"],
     )
 
     temperature = prepare_weather_data_source(
         "temperature",
-        Config.weather_directory,
-        Config.weather_file_ext,
-        Config.regions,
-        Config.common_timestamp_column,
-        Config.expected_weather_data_schema,
-        Config.null_threshold,
+        expected_weather_data_schema,
+        Config["weather_directory"],
+        Config["weather_file_ext"],
+        Config["regions"],
+        Config["common_timestamp_column"],
+        Config["null_threshold"],
     )
 
     wind_speed = prepare_weather_data_source(
         "wind_speed",
-        Config.weather_directory,
-        Config.weather_file_ext,
-        Config.regions,
-        Config.common_timestamp_column,
-        Config.expected_weather_data_schema,
-        Config.null_threshold,
+        expected_weather_data_schema,
+        Config["weather_directory"],
+        Config["weather_file_ext"],
+        Config["regions"],
+        Config["common_timestamp_column"],
+        Config["null_threshold"],
     )
 
     # Joining weather data
     weather_data = (
-        humidity.join(pressure, on=common_timestamp_column)
-        .join(temperature, on=common_timestamp_column)
-        .join(wind_speed, on=common_timestamp_column)
+        humidity.join(pressure, on=Config["common_timestamp_column"])
+        .join(temperature, on=Config["common_timestamp_column"])
+        .join(wind_speed, on=Config["common_timestamp_column"])
     )
 
-    weather_data = extract_datetime_information(weather_data, common_timestamp_column)
+    weather_data = extract_datetime_information(
+        weather_data, Config["common_timestamp_column"]
+    )
 
     weether_data = weather_data.filter(
-        pl.col("year").is_in(years) & pl.col("month").is_in(months)
+        pl.col("year").is_in(Config["years"]) & pl.col("month").is_in(Config["months"])
     )
 
     taxi_df = taxi_df.join(
@@ -84,4 +85,12 @@ if __name__ == "__main__":
         right_on=["year", "month", "day", "hour"],
     )
 
-    print_df(taxi_df)
+    if not os.path.exists(Config["output_dir"]):
+        print(f'{Config["output_dir"]} does not exist. Creating directory')
+        os.mkdir(Config["output_dir"])
+
+    output_file = os.path.join(Config["output_dir"], Config["output_file"])
+    print(f"Writing file {output_file}")
+    taxi_df.write_parquet(output_file)
+
+    print(f"Shape of final data: {taxi_df.shape}")

@@ -5,11 +5,11 @@ from polars.exceptions import ColumnNotFoundError
 
 def prepare_weather_data_source(
     source,
+    expected_schema,
     directory,
     file_ext,
     regions,
     timestamp_column,
-    expected_schema,
     null_threshold,
 ):
     df = pl.read_csv(f"{directory}/{source}.{file_ext}")
