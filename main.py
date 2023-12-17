@@ -7,15 +7,7 @@ from utils import (
     check_for_nulls,
 )
 from metadata import expected_taxi_data_schema, expected_weather_data_schema
-
-months = [1]
-years = [2016]
-regions = ["New York"]
-common_timestamp_column = "datetime"
-weather_directory = "weather_data"
-weather_file_ext = "csv"
-taxi_files = "taxi_data/*parquet"
-null_threshold = 0.1
+from config import Config
 
 # TODO: implement data checks for taxi and weather data
 # TODO: design diagram with draw.io
@@ -27,46 +19,49 @@ if __name__ == "__main__":
     taxi_df = pl.read_parquet(taxi_files)
 
     compare_schemas(expected_taxi_data_schema, taxi_df.schema)
-    check_for_nulls(taxi_df, null_threshold)
+    check_for_nulls(taxi_df, Config.null_threshold)
 
     taxi_df = extract_datetime_information(taxi_df, "tpep_pickup_datetime")
 
     # preparation of weather data
     humidity = prepare_weather_data_source(
         "humidity",
-        weather_directory,
-        weather_file_ext,
-        regions,
-        common_timestamp_column,
-        expected_weather_data_schema,
-        null_threshold,
+        Config.weather_directory,
+        Config.weather_file_ext,
+        Config.regions,
+        Config.common_timestamp_column,
+        Config.expected_weather_data_schema,
+        Config.null_threshold,
     )
 
-    pressuprepare_weather_data_source(
+    pressure = prepare_weather_data_source(
         "pressure",
-        weather_directory,
-        weather_file_ext,
-        regions,
-        common_timestamp_column,
-        expected_weather_data_schema,
+        Config.weather_directory,
+        Config.weather_file_ext,
+        Config.regions,
+        Config.common_timestamp_column,
+        Config.expected_weather_data_schema,
+        Config.null_threshold,
     )
 
     temperature = prepare_weather_data_source(
         "temperature",
-        weather_directory,
-        weather_file_ext,
-        regions,
-        common_timestamp_column,
-        expected_weather_data_schema,
+        Config.weather_directory,
+        Config.weather_file_ext,
+        Config.regions,
+        Config.common_timestamp_column,
+        Config.expected_weather_data_schema,
+        Config.null_threshold,
     )
 
     wind_speed = prepare_weather_data_source(
         "wind_speed",
-        weather_directory,
-        weather_file_ext,
-        regions,
-        common_timestamp_column,
-        expected_weather_data_schema,
+        Config.weather_directory,
+        Config.weather_file_ext,
+        Config.regions,
+        Config.common_timestamp_column,
+        Config.expected_weather_data_schema,
+        Config.null_threshold,
     )
 
     # Joining weather data
