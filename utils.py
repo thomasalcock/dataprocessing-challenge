@@ -22,6 +22,7 @@ def prepare_weather_data_source(
     regions,
     timestamp_column,
     expected_schema,
+    null_threshold,
 ):
     df = pl.read_csv(f"{directory}/{source}.{file_ext}")
     compare_schemas(expected_schema, df.schema)
@@ -29,6 +30,7 @@ def prepare_weather_data_source(
     for region in regions:
         df = df.rename({f"{region}": f"{source}"})
     df = try_datetime_conversion(df, timestamp_column)
+    check_for_nulls(df, null_threshold)
     return df
 
 
@@ -52,3 +54,12 @@ def extract_datetime_information(df, column):
         pl.col(column).dt.day().alias("day"),
         pl.col(column).dt.hour().alias("hour"),
     )
+
+
+def check_for_nulls(df, threshold):
+    null_count = df.null_count().to_dict().items()
+    row_count = df.shape[0]
+    for key, value in null_count:
+        null_ratio = round(100 * value[0] / row_count, 2)
+        if null_ratio >= threshold:
+            print(f"{key} has {null_ratio} of null values")
