@@ -1,6 +1,3 @@
-from dataclasses import dataclass
-from typing import List
-
 Config = {
     "months": [1],
     "years": [2016],
