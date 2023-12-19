@@ -1,7 +1,7 @@
 import polars as pl
 import polars.selectors as cs
 from polars.exceptions import ColumnNotFoundError
-from typing import List, OrderedDict, Union
+from typing import List, OrderedDict, Union, Any
 
 
 def prepare_weather_data_source(
@@ -30,7 +30,7 @@ def prepare_weather_data_source(
     return df
 
 
-def print_df(df: pl.DataFrame) -> pl.DataFrame:
+def print_df(df: pl.DataFrame):
     """
     Prints a polars dataframe with all columns visible. Default printing behaviour replaces
     columns with '...', hence this function.
@@ -42,7 +42,7 @@ def print_df(df: pl.DataFrame) -> pl.DataFrame:
 
 def try_datetime_conversion(
     df: pl.DataFrame, column: str, format: str = "%Y-%m-%d %H:%M:%S"
-):
+) -> pl.DataFrame:
     """
     Attempts to parse a given column to a timestamp using the given format. Throws a specific
     error if the column values cannot be parsed. The 'strict' argument ensures that polars
@@ -53,15 +53,13 @@ def try_datetime_conversion(
         return df
     except Exception as e:
         raise ValueError(f"column {column} cannot be parsed to format: {format}: {e}")
+        return
 
 
-def extract_datetime_information(df: pl.DataFrame, column: str):
+def extract_datetime_information(df: pl.DataFrame, column: str) -> pl.DataFrame:
     """
     Extracts the year, month, day and hour from a timestamp column.
     Several tables require the same information be extracted, hence this function.
-
-    :param df: a polars dataframe
-    :return
     """
     return df.with_columns(
         pl.col(column).dt.year().alias("year"),
@@ -72,6 +70,10 @@ def extract_datetime_information(df: pl.DataFrame, column: str):
 
 
 def check_for_nulls(df: pl.DataFrame, threshold: float):
+    """
+    checks a column in a polars dataframe for null values and prints the percentage of rows
+    with null values in a given column to stdout.
+    """
     null_count = df.null_count().to_dict().items()
     row_count = df.shape[0]
     for key, value in null_count:
@@ -80,7 +82,13 @@ def check_for_nulls(df: pl.DataFrame, threshold: float):
             print(f"{key} has {null_ratio}% of null values")
 
 
-def compare_schemas(expected: OrderedDict, actual: OrderedDict):
+def compare_schemas(
+    expected: OrderedDict[Any, Any],
+    actual: OrderedDict[Any, Any],
+):
+    """
+    Compares two polars dataframe schemas with type OrderedDict. Prints any mismatches to stdout.
+    """
     expected_len = len(expected)
     actual_len = len(actual)
     if expected_len != actual_len:
@@ -98,6 +106,10 @@ def check_range(
     min_value: Union[int, float],
     max_value: Union[int, float],
 ):
+    """
+    Checks if values in a column in polars dataframe are outside of the range specified by min_value and max_value.
+    If any rows fall outside of this range, the offending rows are printed to stdout.
+    """
     out_of_range = df.filter(
         (pl.col(column) > max_value) | (pl.col(column) < min_value)
     )
