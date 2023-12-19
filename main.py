@@ -6,11 +6,11 @@ from utils import (
     extract_datetime_information,
     print_df,
     check_for_nulls,
+    check_range,
 )
 from metadata import expected_taxi_data_schema, expected_weather_data_schema
 from config import Config
 
-# TODO: implement data checks for taxi and weather data
 # TODO: design diagram with draw.io
 
 if __name__ == "__main__":
@@ -33,6 +33,8 @@ if __name__ == "__main__":
         Config["null_threshold"],
     )
 
+    check_range(humidity, "humidity", 0, 100)
+
     pressure = prepare_weather_data_source(
         "pressure",
         expected_weather_data_schema,
@@ -42,6 +44,10 @@ if __name__ == "__main__":
         Config["common_timestamp_column"],
         Config["null_threshold"],
     )
+
+    # pressure measured in hectopascal (hpa)
+    # max recorded at sea level: 1050 hpa, min about 850 hpa
+    check_range(pressure, "pressure", 850, 1050)
 
     temperature = prepare_weather_data_source(
         "temperature",
@@ -53,6 +59,7 @@ if __name__ == "__main__":
         Config["null_threshold"],
     )
 
+    # temperature recorde in degrees fahrenheit
     wind_speed = prepare_weather_data_source(
         "wind_speed",
         expected_weather_data_schema,
@@ -86,7 +93,6 @@ if __name__ == "__main__":
     )
 
     if not os.path.exists(Config["output_dir"]):
-        print(f'{Config["output_dir"]} does not exist. Creating directory')
         os.mkdir(Config["output_dir"])
 
     output_file = os.path.join(Config["output_dir"], Config["output_file"])

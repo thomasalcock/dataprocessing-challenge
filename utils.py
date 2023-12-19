@@ -50,7 +50,7 @@ def check_for_nulls(df, threshold):
     for key, value in null_count:
         null_ratio = round(100 * value[0] / row_count, 2)
         if null_ratio >= threshold:
-            print(f"{key} has {null_ratio} of null values")
+            print(f"{key} has {null_ratio}% of null values")
 
 
 def compare_schemas(expected, actual):
@@ -63,3 +63,13 @@ def compare_schemas(expected, actual):
             print(
                 f"Field: {actual_value} does not match expected field: {expected_value}"
             )
+
+
+def check_range(df, column, min_value, max_value):
+    n_out_of_range = df.filter(
+        (pl.col(column) > max_value) | (pl.col(column) < min_value)
+    ).shape[0]
+    if n_out_of_range > 0:
+        print(
+            f"{n_out_of_range} rows of {column} either below {min_value} or above {max_value}!"
+        )
