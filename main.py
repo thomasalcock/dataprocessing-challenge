@@ -36,9 +36,8 @@ if __name__ == "__main__":
 
     if n_fares_but_no_passengers > 0:
         print(
-            f"{n_fares_but_no_passengers} had positive fare amounts but no passengers"
+            f"{n_fares_but_no_passengers} trips had positive fare amounts but no passengers!"
         )
-        print_df(fares_but_no_passengers)
 
     # preparation of weather data
     humidity = prepare_weather_data_source(
@@ -51,7 +50,7 @@ if __name__ == "__main__":
         Config.null_threshold,
     )
 
-    # humidity is measured in
+    # humidity is measured in percent
     check_range(humidity, "humidity", 0, 100)
 
     pressure = prepare_weather_data_source(

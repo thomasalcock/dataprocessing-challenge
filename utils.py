@@ -79,7 +79,7 @@ def check_for_nulls(df: pl.DataFrame, threshold: float):
     for key, value in null_count:
         null_ratio = round(100 * value[0] / row_count, 2)
         if null_ratio >= threshold:
-            print(f"{key} has {null_ratio}% of null values")
+            print(f"{key} has {null_ratio}% null values")
 
 
 def compare_schemas(
@@ -118,4 +118,3 @@ def check_range(
         print(
             f"{n_out_of_range} rows of {column} either below {min_value} or above {max_value}!",
         )
-        print_df(out_of_range)
