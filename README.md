@@ -1,6 +1,14 @@
 # Dataprocessing challenge
 
-Solution to the data processing challenge 
+This repository contains a solution to an interview challenge for the following problem:
+
+A taxi company needs to extract insights from their data to improve their operations. To this end you must
+
+1. Sketch an architecture on how to process new data batchwise and streams of data in the cloud.
+2. Write a script to load the taxi data and join it with weather data
+3. Perform data tests to evaluate the quality of the data
+
+# Solution
 
 1. Architecture
 
